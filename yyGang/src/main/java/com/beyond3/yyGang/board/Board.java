@@ -1,3 +1,4 @@
+
 package com.beyond3.yyGang.board;
 
 import com.beyond3.yyGang.user.domain.User;
