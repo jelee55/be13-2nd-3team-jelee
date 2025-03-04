@@ -1,6 +1,6 @@
 package com.beyond3.yyGang.comment;
 
-import com.beyond3.yyGang.board.Board;
+import com.beyond3.yyGang.board.entity.Board;
 import com.beyond3.yyGang.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +40,6 @@ public class Comment {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "board")
     private Board board;
 }

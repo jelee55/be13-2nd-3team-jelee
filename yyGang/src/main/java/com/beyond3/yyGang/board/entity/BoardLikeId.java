@@ -1,4 +1,4 @@
-package com.beyond3.yyGang.board;
+package com.beyond3.yyGang.board.entity;
 
 
 import jakarta.persistence.Embeddable;
