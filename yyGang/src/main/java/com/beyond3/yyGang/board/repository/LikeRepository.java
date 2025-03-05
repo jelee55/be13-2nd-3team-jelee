@@ -4,6 +4,6 @@
 //import com.beyond3.yyGang.board.entity.BoardLikeId;
 //import org.springframework.data.jpa.repository.JpaRepository;
 //
-//public interface LikeRepository extends JpaRepository<BoardLike, Long> {
-////    boolean existsById(BoardLikeId likeId);
+//public interface LikeRepository extends JpaRepository<BoardLike, BoardLikeId> {
+//    boolean existsById(BoardLikeId likeId);
 //}
