@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,11 +25,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void save(Long boardId, CommentRequestDto requestDto) {
+    public void save(Principal principal, Long boardId, CommentRequestDto requestDto) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글 없음"));
 
-        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(
+        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
                 () -> new IllegalArgumentException("해당 유저 없으"));
 
         Comment comment = requestDto.toEntity(user, board);
@@ -39,9 +40,19 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void update(Long id, CommentRequestDto requestDto) {
+    public void update(Principal principal, Long id, CommentRequestDto requestDto) {
+
+        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
+                () -> new IllegalArgumentException("해당 유저 없으"));
+
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글이 없음"));
+
+        boolean x = user.getUserId() == comment.getUser().getUserId();
+        if (!x){
+            throw new IllegalArgumentException("작성자 불일치");
+        }
+
         comment.update(requestDto);
     }
 
@@ -54,9 +65,20 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void delete(Long id) {
-        if (!commentRepository.existsById(id)){
-            throw new IllegalArgumentException("해당 댓글 없음");
+    @Transactional
+    public void delete(Principal principal, Long id) {
+//        if (!commentRepository.existsById(id)){
+//            throw new IllegalArgumentException("해당 댓글 없음");
+//        }
+        Comment comment = commentRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("해당 댓글이 없음"));
+
+        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
+                () -> new IllegalArgumentException("해당 유저 없으"));
+
+        boolean x = user.getUserId() == comment.getUser().getUserId();
+        if (!x){
+            throw new IllegalArgumentException("작성자 불일치");
         }
         commentRepository.deleteById(id);
     }

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,19 +18,20 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentResponseDto> save (
+            Principal principal,
             @PathVariable(value = "boardId") Long boardId,
             @RequestBody CommentRequestDto requestDto){
 
 
-        commentService.save(boardId, requestDto);
+        commentService.save(principal, boardId, requestDto);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentResponseDto> update(@PathVariable Long id, @RequestBody CommentRequestDto requestDto){
+    public ResponseEntity<CommentResponseDto> update(Principal principal,@PathVariable Long id, @RequestBody CommentRequestDto requestDto){
 
-        commentService.update(id, requestDto);
+        commentService.update(principal, id, requestDto);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -43,8 +45,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Long> delete(@PathVariable Long id){
-        commentService.delete(id);
+    public ResponseEntity<Long> delete(Principal principal, @PathVariable Long id){
+        commentService.delete(principal, id);
         return ResponseEntity.ok(id);
     }
 

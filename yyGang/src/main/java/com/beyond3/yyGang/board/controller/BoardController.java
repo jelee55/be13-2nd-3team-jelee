@@ -8,10 +8,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Tag(name = "Board", description = "자유 게시판")
@@ -25,23 +27,26 @@ public class BoardController {
 
     @PostMapping
     @Operation(summary = "등록", description = "게시글 등록")
-    public ResponseEntity<BoardResponseDto> save(@RequestBody BoardRequestDto requestDto) {
-        boardService.save(requestDto);
+    public ResponseEntity<BoardResponseDto> save(Principal principal, @RequestBody BoardRequestDto requestDto) {
+        boardService.save(requestDto, principal);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+
     @GetMapping
     @Operation(summary = "조회", description = "게시글 조회")
-    public ResponseEntity<List<BoardResponseDto>> findAll(){
-        List<BoardResponseDto> board = boardService.findAll();
-        return ResponseEntity.ok(board);
+    public ResponseEntity<List<BoardResponseDto>> findAll(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size ){
+        Page<BoardResponseDto> boardList = boardService.findAll(page, size);
+        return ResponseEntity.ok(boardList.getContent());
 
     }
     @GetMapping("/{id}")
     @Operation(summary = "상세조회", description = "게시글 상세조회")
     public ResponseEntity<BoardResponseDto> findById(@PathVariable Long id){
+
         Board board = boardService.findById(id);
-        System.out.println(board+"boarddddddd");
 
         return ResponseEntity.ok(new BoardResponseDto(board));
 
@@ -50,17 +55,17 @@ public class BoardController {
     @PutMapping("/{id}")
     @Operation(summary = "수정", description = "게시글 수정")
     public ResponseEntity<BoardResponseDto> update(
+            Principal principal,
             @PathVariable Long id,
             @RequestBody BoardRequestDto requestDto){
 
-        BoardResponseDto board = boardService.update(id, requestDto);
+        BoardResponseDto board = boardService.update(principal, id, requestDto);
         return ResponseEntity.ok(board);
-
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Long> delete(@PathVariable Long id){
-        boardService.delete(id);
+    public ResponseEntity<Long> delete(Principal principal,@PathVariable Long id){
+        boardService.delete(principal, id);
         return ResponseEntity.ok(id);
     }
 
