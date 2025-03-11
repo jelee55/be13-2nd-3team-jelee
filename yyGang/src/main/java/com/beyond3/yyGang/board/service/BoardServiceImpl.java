@@ -25,13 +25,30 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
 
+
+    public User userByPrincipal(Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
+                        () -> new IllegalArgumentException("해당 유저 없음: "));
+        return user;
+    }
+
+    public Board findBoardById(Long id) {
+        Board board = boardRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("해당 게시글 없음"));
+        return board;
+    }
+
+    public void validateOwner(User user, Board board) {
+        if (!user.getUserId().equals(board.getUser().getUserId())) {
+            throw new IllegalArgumentException("해당 게시글 작성자불일치");
+        }
+    }
+
     @Override
     @Transactional
     public void save(BoardRequestDto requestDto, Principal principal) {
 
-        User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(
-                        () -> new IllegalArgumentException("해당 유저 없음: " + requestDto.getUserId()));
+        User user = userByPrincipal(principal);
 
         Board board = requestDto.toEntity(user);
 
@@ -59,17 +76,13 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardResponseDto update(Principal principal, Long id, BoardRequestDto requestDto) {
-        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
-                () -> new IllegalArgumentException("없어"));
+        User user = userByPrincipal(principal);
 
 
-        Board board = boardRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("해당 게시글 없음 ::" + id));
+        Board board = findBoardById(id);
 
-        boolean y = user.getUserId() == board.getUser().getUserId();
-        if(!y){
-            throw new IllegalArgumentException("해당 게시글 작성자 불일치");
-        }
+        validateOwner(user, board);
+
         board.update(requestDto);
         boardRepository.save(board);
         return new BoardResponseDto(board);
@@ -77,26 +90,19 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board findById(Long id) {
-        return boardRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("해당 게시글 없음"));
+        return findBoardById(id);
     }
 
     @Override
     @Transactional
     public void delete(Principal principal, Long id) {
-//        if (!boardRepository.existsById(id)){
-//           throw new IllegalArgumentException("해당 게시글 없음");
-//        }
-        Board board = boardRepository.findById(id).orElseThrow(
-            () -> new IllegalArgumentException("해당 게시글 없음 ::" + id));
 
-        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
-            () -> new IllegalArgumentException("없어"));
+        Board board = findBoardById(id);
 
-        boolean y = user.getUserId() == board.getUser().getUserId();
-        if(!y){
-            throw new IllegalArgumentException("해당 게시글 작성자 불일치");
-        }
-       boardRepository.deleteById(id);
+        User user = userByPrincipal(principal);
+
+        validateOwner(user, board);
+
+        boardRepository.deleteById(id);
     }
 }
