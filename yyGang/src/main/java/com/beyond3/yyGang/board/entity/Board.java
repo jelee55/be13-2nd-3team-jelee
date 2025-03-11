@@ -44,5 +44,4 @@ public class Board extends TimeStamped {
         this.content = requestDto.getContent();
     }
 
-
 }

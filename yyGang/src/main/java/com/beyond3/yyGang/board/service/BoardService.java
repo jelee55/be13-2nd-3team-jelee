@@ -17,4 +17,6 @@ public interface BoardService {
     Board findById(Long id);
 
     void delete(Principal principal, Long id);
+
+    long getBoardLikeCount(Long boardId);
 }

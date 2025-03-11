@@ -1,6 +1,7 @@
 package com.beyond3.yyGang.board.service;
 
 import com.beyond3.yyGang.board.entity.Board;
+import com.beyond3.yyGang.board.repository.BoardLikeRepository;
 import com.beyond3.yyGang.board.repository.BoardRepository;
 import com.beyond3.yyGang.board.dto.BoardRequestDto;
 import com.beyond3.yyGang.board.dto.BoardResponseDto;
@@ -24,6 +25,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
 
     public User userByPrincipal(Principal principal) {
@@ -57,7 +59,6 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Page<BoardResponseDto> findAll(int page, int size) {
-        List<Board> board = boardRepository.findAll();
 
         if(page < 0 || size <= 0){
             throw new IllegalArgumentException("page, size가 유효하지 않음");
@@ -104,5 +105,13 @@ public class BoardServiceImpl implements BoardService {
         validateOwner(user, board);
 
         boardRepository.deleteById(id);
+    }
+
+    @Override
+    public long getBoardLikeCount(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new IllegalArgumentException());
+
+        return boardLikeRepository.countByBoard(board);
     }
 }

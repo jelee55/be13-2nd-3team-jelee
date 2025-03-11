@@ -33,6 +33,8 @@ public class BoardController {
     }
 
 
+
+
     @GetMapping
     @Operation(summary = "조회", description = "게시글 조회")
     public ResponseEntity<List<BoardResponseDto>> findAll(
@@ -42,6 +44,10 @@ public class BoardController {
         return ResponseEntity.ok(boardList.getContent());
 
     }
+
+
+
+
     @GetMapping("/{id}")
     @Operation(summary = "상세조회", description = "게시글 상세조회")
     public ResponseEntity<BoardResponseDto> findById(@PathVariable Long id){
@@ -64,9 +70,17 @@ public class BoardController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "삭제", description = "게시글 삭제")
     public ResponseEntity<Long> delete(Principal principal,@PathVariable Long id){
         boardService.delete(principal, id);
         return ResponseEntity.ok(id);
+    }
+
+    @GetMapping("/{id}/likes")
+    @Operation(summary = "좋아요 수", description = "게시글 좋아요 수")
+    public ResponseEntity<Long> getBoardLikeCount(@PathVariable("id") Long boardId){
+        long likeCount = boardService.getBoardLikeCount(boardId);
+        return ResponseEntity.ok(likeCount);
     }
 
 }

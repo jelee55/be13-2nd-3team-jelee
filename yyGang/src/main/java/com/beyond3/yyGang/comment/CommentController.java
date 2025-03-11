@@ -1,6 +1,7 @@
 package com.beyond3.yyGang.comment;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +40,13 @@ public class CommentController {
 
     // 특정 게시글 댓글 조회
     @GetMapping
-    public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long boardId){
+    public ResponseEntity<List<CommentResponseDto>> getComments(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @PathVariable Long boardId){
+        Page<CommentResponseDto> commetList = commentService.getComments(page, size, boardId);
 
-        return ResponseEntity.ok(commentService.getComments(boardId));
+        return ResponseEntity.ok(commetList.getContent());
     }
 
     @DeleteMapping("/{id}")

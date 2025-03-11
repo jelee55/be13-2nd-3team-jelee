@@ -7,11 +7,14 @@ import com.beyond3.yyGang.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,19 +60,26 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentResponseDto> getComments(Long boardId) {
-        return commentRepository.findByBoardId(boardId)
-                .stream()
-                .map(CommentResponseDto::new)
-                .collect(Collectors.toList());
+    public Page<CommentResponseDto> getComments(int page, int size, Long boardId) {
+
+        if(page < 0 || size <= 0){
+            throw new IllegalArgumentException("댓글이 없음");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Comment> commentPage = commentRepository.findByBoardId(boardId, pageable);
+
+        if (commentPage.isEmpty()){
+            throw new IllegalArgumentException("존재하지 않음");
+        }
+        return commentPage.map(CommentResponseDto::new);
+
     }
 
     @Override
     @Transactional
     public void delete(Principal principal, Long id) {
-//        if (!commentRepository.existsById(id)){
-//            throw new IllegalArgumentException("해당 댓글 없음");
-//        }
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("해당 댓글이 없음"));
 
