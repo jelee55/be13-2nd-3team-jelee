@@ -1,5 +1,6 @@
 package com.beyond3.yyGang.board.service;
 
+import com.beyond3.yyGang.board.dto.BoardUpdateRequestDto;
 import com.beyond3.yyGang.board.entity.Board;
 import com.beyond3.yyGang.board.repository.BoardLikeRepository;
 import com.beyond3.yyGang.board.repository.BoardRepository;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -76,7 +76,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional
-    public BoardResponseDto update(Principal principal, Long id, BoardRequestDto requestDto) {
+    public BoardResponseDto update(Principal principal, Long id, BoardUpdateRequestDto requestDto) {
         User user = userByPrincipal(principal);
 
 

@@ -1,11 +1,13 @@
 package com.beyond3.yyGang.board.controller;
 
+import com.beyond3.yyGang.board.dto.BoardUpdateRequestDto;
 import com.beyond3.yyGang.board.entity.Board;
 import com.beyond3.yyGang.board.dto.BoardRequestDto;
 import com.beyond3.yyGang.board.dto.BoardResponseDto;
 import com.beyond3.yyGang.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,7 +29,7 @@ public class BoardController {
 
     @PostMapping
     @Operation(summary = "등록", description = "게시글 등록")
-    public ResponseEntity<BoardResponseDto> save(Principal principal, @RequestBody BoardRequestDto requestDto) {
+    public ResponseEntity<BoardResponseDto> save(Principal principal, @Valid @RequestBody BoardRequestDto requestDto) {
         boardService.save(requestDto, principal);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -63,7 +65,7 @@ public class BoardController {
     public ResponseEntity<BoardResponseDto> update(
             Principal principal,
             @PathVariable Long id,
-            @RequestBody BoardRequestDto requestDto){
+            @RequestBody BoardUpdateRequestDto requestDto){
 
         BoardResponseDto board = boardService.update(principal, id, requestDto);
         return ResponseEntity.ok(board);

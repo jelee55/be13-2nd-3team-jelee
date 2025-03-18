@@ -1,5 +1,6 @@
 package com.beyond3.yyGang.board.service;
 
+import com.beyond3.yyGang.board.dto.BoardUpdateRequestDto;
 import com.beyond3.yyGang.board.entity.Board;
 import com.beyond3.yyGang.board.dto.BoardRequestDto;
 import com.beyond3.yyGang.board.dto.BoardResponseDto;
@@ -12,7 +13,7 @@ public interface BoardService {
 
     Page<BoardResponseDto> findAll(int page, int size);
 
-    BoardResponseDto update(Principal principal, Long id, BoardRequestDto requestDto);
+    BoardResponseDto update(Principal principal, Long id, BoardUpdateRequestDto requestDto);
 
     Board findById(Long id);
 
