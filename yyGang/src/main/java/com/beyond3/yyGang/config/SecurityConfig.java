@@ -17,6 +17,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -31,8 +34,16 @@ public class SecurityConfig {
 
         // 스프링 시큐리티가 HTTP 요청에 대한 보안 설정을 적용
         http
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:5174")); // 허용할 프론트엔드 주소
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
+                    return config;
+                }))
                 .csrf(AbstractHttpConfigurer::disable)      // JWT를 사용하니 세션 사용 비활성화
-                .cors(Customizer.withDefaults())
+//                .cors(Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)     // 기본 HTTP 인증 방식 Basic Authentication 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement((sesstionManagement) ->
@@ -76,4 +87,7 @@ public class SecurityConfig {
         // BCryptPasswordEncoder를 기본으로 다양한 여러 암호화 방식을 추가할 수 있음
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
+
+
 }
