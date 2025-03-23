@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -34,16 +35,10 @@ public class SecurityConfig {
 
         // 스프링 시큐리티가 HTTP 요청에 대한 보안 설정을 적용
         http
-//                .cors(cors -> cors.configurationSource(request -> {
-//                    CorsConfiguration config = new CorsConfiguration();
-//                    config.setAllowedOrigins(List.of("http://localhost:5174")); // 허용할 프론트엔드 주소
-//                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//                    config.setAllowedHeaders(List.of("*"));
-//                    config.setAllowCredentials(true);
-//                    return config;
-//                }))
                 .csrf(AbstractHttpConfigurer::disable)      // JWT를 사용하니 세션 사용 비활성화
-                .cors(Customizer.withDefaults())
+                .cors(corsCustomizer ->
+                        corsCustomizer.configurationSource(getCorsConfigurationSource())
+                )
                 .httpBasic(AbstractHttpConfigurer::disable)     // 기본 HTTP 인증 방식 Basic Authentication 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement((sesstionManagement) ->
@@ -88,6 +83,34 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    // CORS 정책을 설정하는 코드 -> 웹 애플리케이션이 다른 도메인, 프로토콜 또는 포트에서 호스팅되는 리소스에 접근하려 할 때
+    // 발생하는 보안 문제를 해결하기 위한 표준
+    private static CorsConfigurationSource getCorsConfigurationSource() {
+        return (request) -> {
+            // CorsConfiguration 객체를 생성해서 CORS 정책을 설정한다.
+            CorsConfiguration configuration = new CorsConfiguration();
 
+            // CORS 요청에서 허용할 출처를 설정한다.
+            configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174"));
+            // configuration.setAllowedOriginPatterns(List.of("*"));
 
+            // CORS 요청에서 허용할 HTTP 메소드를 지정한다.
+            configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+            // 클라이언트가 요청 시 사용할 수 있는 헤더를 지정한다.
+            configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
+            // 클라이언트가 응답에서 접근할 수 있는 헤더를 지정한다.
+            configuration.setExposedHeaders(List.of("Authorization"));
+
+            // 자격 증명(쿠키, 세션) 허용 여부를 설정한다.
+            configuration.setAllowCredentials(true);
+
+            // CORS Preflight 요청(OPTIONS 메서드)을 브라우저가 캐싱하는 시간(초 단위)을 설정한다.
+            configuration.setMaxAge(3600L);
+
+            return configuration;
+        };
+
+    }
 }

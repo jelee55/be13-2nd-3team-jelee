@@ -10,6 +10,7 @@ import com.beyond3.yyGang.user.domain.User;
 import com.beyond3.yyGang.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -91,7 +92,10 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Board findById(Long id) {
-        return findBoardById(id);
+        Board board = findBoardById(id);
+        System.out.println(board);
+
+        return board;
     }
 
     @Override

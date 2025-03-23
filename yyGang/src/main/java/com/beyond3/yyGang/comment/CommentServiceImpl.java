@@ -7,14 +7,12 @@ import com.beyond3.yyGang.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-
 
 import java.security.Principal;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -31,14 +29,13 @@ public class CommentServiceImpl implements CommentService {
     public void save(Principal principal, Long boardId, CommentRequestDto requestDto) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글 없음"));
-
+        System.out.println("usergetname::::"+ principal.getName());
         User user = userRepository.findByEmail(principal.getName()).orElseThrow(
                 () -> new IllegalArgumentException("해당 유저 없으"));
-
+        log.info("user", user);
         Comment comment = requestDto.toEntity(user, board);
 
         commentRepository.save(comment);
-
     }
 
     @Override

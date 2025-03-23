@@ -3,23 +3,14 @@ package com.beyond3.yyGang.comment;
 import com.beyond3.yyGang.board.TimeStamped;
 import com.beyond3.yyGang.board.entity.Board;
 import com.beyond3.yyGang.user.domain.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,7 +28,6 @@ public class Comment extends TimeStamped {
     @Column(name = "comment_content")
     private String content;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -45,6 +35,16 @@ public class Comment extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
+
+    // 대댓글을 위한 자기참조 관계 추가
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "parent_id")
+//    private Comment parentComment;
+    @Column(name = "parent_id")
+    private long parentId;
+
+//    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Comment> childComments = new ArrayList<>();
 
     public void update(CommentRequestDto requestDto) {
         this.content = requestDto.getContent();

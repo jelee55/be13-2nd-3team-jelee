@@ -44,9 +44,9 @@ public class CommentController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @PathVariable Long boardId){
-        Page<CommentResponseDto> commetList = commentService.getComments(page, size, boardId);
+        Page<CommentResponseDto> commentList = commentService.getComments(page, size, boardId);
 
-        return ResponseEntity.ok(commetList.getContent());
+        return ResponseEntity.ok(commentList.getContent());
     }
 
     @DeleteMapping("/{id}")

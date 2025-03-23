@@ -7,16 +7,14 @@ import com.beyond3.yyGang.board.dto.BoardUpdateRequestDto;
 import com.beyond3.yyGang.comment.Comment;
 import com.beyond3.yyGang.user.domain.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Entity
 @Builder
+@ToString
 @Table(name = "board")
 @NoArgsConstructor
 @AllArgsConstructor
