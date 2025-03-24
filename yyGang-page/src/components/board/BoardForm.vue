@@ -1,20 +1,21 @@
 <template>
     <form @submit.prevent="submitClick">
-        <div class="mb-3 row">
-            <label for="title" class="col-sm-2 col-form-label">제목</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="title" v-model.trim="formData.title">
+            <div class="mb-3 row">
+                <label for="title" class="col-sm-2 col-form-label">제목</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="title" v-model.trim="formData.title">
+                </div>
             </div>
-        </div>
-        <div class="mb-3 row">
-            <label for="content" class="col-sm-2 col-form-label">내용</label>
-            <div class="col-sm-10">
-                <textarea type="text" class="form-control" id="content" v-model.trim="formData.content"></textarea>
+            <div class="mb-3 row">
+                <label for="content" class="col-sm-2 col-form-label">내용</label>
+                <div class="col-sm-10">
+                    <textarea type="text" class="form-control" id="content" v-model.trim="formData.content"></textarea>
+                </div>
             </div>
-        </div>
-
+        <div id="divBtn">
             <button  type="submit" class="btn btn-success" v-text="submitButtonText"></button>
             <button class="btn btn-light" type="button" @click="buttonClick">뒤로가기</button>
+        </div>
     </form>
 </template>
 
@@ -52,3 +53,10 @@
 
 
 </script>
+
+<style>
+    #divBtn{
+        border-top: 2px solid rgb(51, 116, 51);
+        padding-top: 3%;
+    }
+ </style>

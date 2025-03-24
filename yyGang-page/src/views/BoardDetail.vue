@@ -1,8 +1,6 @@
 <template>
     <main>
-        <h2>상세조회</h2>
         <div id="mainArea">
-            
             <div id="boardArea">
                 <div>
                     <h3 style="font-weight:bold">{{ board.title }}</h3>
