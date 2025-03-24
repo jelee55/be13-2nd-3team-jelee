@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CommentService {
 
-    void save(Principal principal, Long boardId, CommentRequestDto requestDto);
+    void save(Principal principal, Long boardId, CommentRequestDto requestDto, Long parentId);
 
     void update(Principal principal, Long id, CommentRequestDto requestDto);
 

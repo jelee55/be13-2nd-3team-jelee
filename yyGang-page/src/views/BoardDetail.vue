@@ -17,9 +17,28 @@
                 <button class="btn btn-success" v-if="isLoggedIn && userInfo.username === board.userEmail" @click="delBtnClick(board.id)">삭제</button>
                 <button @click="btnClick" class="btn btn-success">뒤로가기</button>
             </div>
+            <!-- <div class="mt-2 p-3 bg-body rounded shadow-sm">
+                <h2 class="fs-6">댓글 쓰기</h2>
+
+                <input class="form-control" type="text">
+                <div class="form-text">존중과 배려하는 마음으로 건강한 댓글 문화를 함께 만들어가요.</div>
+
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-success">등록</button>
+                </div>
+
+            </div> -->
+
             <div id="commentArea">
-                <div>댓글 작성자</div>
-                <div>댓글 내용</div>
+                <h4>댓글 *개</h4>
+                <div v-for="cmt in comment" :key="cmt.id">
+                    <strong>{{ cmt.userId }}</strong>: {{ cmt.content }} <br>
+                    <span style="color: gray; font-size: 12px;">{{ cmt.createdAt }}</span>
+
+                    <div v-for="x in cmt.childComments" :key="x.id">
+                        ㄴ> {{ x.userId }} : {{ x.content }}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -28,7 +47,7 @@
 
 <script setup>
     import apiClient from '@/api';
-    import { reactive } from 'vue';
+    import { reactive, toRaw } from 'vue';
     import { onMounted, ref } from 'vue'; 
     import { useRoute, useRouter } from 'vue-router';
     import { useAuthStore } from '@/stores/auth';
@@ -39,17 +58,36 @@
     const router = useRouter();
     const currentRoute = useRoute();
     const board = reactive({});
+    const comment = ref([]);
     const userEmail = localStorage.getItem('userInfo');
+
+    
     const fetchBoard = async(id)=>{
         try {
             const response = await apiClient.get(`/board/${id}`);
-            console.log(response.data);
+            
+            // console.log(response.data);
   
             Object.assign(board, response.data);
         } catch (error) {
             
         }
     };
+
+    const fetchComment = async(id)=>{
+        try {
+            const response = await apiClient.get(`/board/${id}/comment`);
+
+            console.log(response.data);
+
+            comment.value = await response.data;
+
+        } catch (error) {
+            
+        }
+
+    };
+
     const btnClick = ()=>{
         router.push({name:'board'});
     };
@@ -89,6 +127,7 @@
 
     onMounted(function(){
         fetchBoard(currentRoute.params.id);
+        fetchComment(currentRoute.params.id)
     });
     
 </script>

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @ToString
@@ -13,15 +14,29 @@ public class CommentResponseDto {
     private String content;
     private Long userId;
     private Long boardId;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private Long parentId;
+//    private LocalDateTime createdAt;
+//    private LocalDateTime modifiedAt;
+    private List<CommentResponseDto> childComments; // 대댓글 리스트
 
-    public CommentResponseDto(Comment comment) {
-        this.id = comment.getId();
-        this.content = comment.getContent();
-        this.userId = comment.getUser().getUserId();
-        this.boardId = comment.getBoard().getId();
-        this.createdAt = comment.getCreateAt();
-        this.modifiedAt = comment.getModifiedAt();
+    // 명시적 생성자 추가
+    public CommentResponseDto(Long id, String content, Long userId, Long boardId, Long parentId, List<CommentResponseDto> childComments) {
+        this.id = id;
+        this.content = content;
+        this.userId = userId;
+        this.boardId = boardId;
+        this.parentId = parentId;
+        this.childComments = childComments;
+    }
+    // 엔티티를 DTO로 변환하는 메서드
+    public static CommentResponseDto fromEntity(Comment comment, List<Comment> childComments) {
+        return new CommentResponseDto(
+                comment.getId(),
+                comment.getContent(),
+                comment.getUser().getUserId(),
+                comment.getBoard().getId(),
+                comment.getParentComment() != null ? comment.getParentComment().getId() : null,
+                childComments.stream().map(c -> fromEntity(c, List.of())).toList() // 대댓글을 재귀적으로 변환
+        );
     }
 }

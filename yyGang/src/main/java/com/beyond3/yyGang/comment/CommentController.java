@@ -21,10 +21,12 @@ public class CommentController {
     public ResponseEntity<CommentResponseDto> save (
             Principal principal,
             @PathVariable(value = "boardId") Long boardId,
-            @RequestBody CommentRequestDto requestDto){
+            @RequestBody CommentRequestDto requestDto,
+            @RequestParam(required = false) Long parentId // 대댓글일 경우 parentId 전달
+    ){
 
 
-        commentService.save(principal, boardId, requestDto);
+        commentService.save(principal, boardId, requestDto, parentId);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

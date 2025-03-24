@@ -26,6 +26,9 @@
         }
     };
     const formSubmit = async(formData)=>{
+        if(!confirm(`수정할겨?`)){
+            return;
+        }
         try {
             const response = await apiClient.put(`/board/${formData.id}`, formData)
 
@@ -37,9 +40,9 @@
             }
         } catch (error) {
             if (error.response.status === 400) {
-                alert(`학과 정보를 모두 입력해 주세요`);
-            }else if(error.response.data.code === 404){
-                alert(error.response.data.message);
+                alert(`500자이내 작성`);
+            }else if(error.response.status === 404){
+                alert(error.response.status);
                 router.push({name:'board'});
             }else{
                 alert('에러가 발생');

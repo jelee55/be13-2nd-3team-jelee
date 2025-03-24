@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -26,16 +27,28 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void save(Principal principal, Long boardId, CommentRequestDto requestDto) {
+    public void save(Principal principal, Long boardId, CommentRequestDto requestDto, Long parentId) {
+
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글 없음"));
-        System.out.println("usergetname::::"+ principal.getName());
+
         User user = userRepository.findByEmail(principal.getName()).orElseThrow(
                 () -> new IllegalArgumentException("해당 유저 없으"));
-        log.info("user", user);
-        Comment comment = requestDto.toEntity(user, board);
 
-        commentRepository.save(comment);
+        Comment parentComment = null;
+
+        if (parentId != null) { // parentId가 있으면 부모 댓글 조회
+            parentComment = commentRepository.findById(parentId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 부모 댓글이 존재하지 않습니다."));
+        }
+
+        Comment comment = requestDto.toEntity(user, board, parentComment);
+
+        if (parentComment != null) {
+            parentComment.addChild(comment); // 부모 댓글에 대댓글 추가
+        }
+
+        commentRepository.save(comment).getId();
     }
 
     @Override
@@ -65,12 +78,13 @@ public class CommentServiceImpl implements CommentService {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Comment> commentPage = commentRepository.findByBoardId(boardId, pageable);
+        Page<Comment> parentComments = commentRepository.findByBoardIdAndParentCommentIsNull(boardId, pageable);
 
-        if (commentPage.isEmpty()){
-            throw new IllegalArgumentException("존재하지 않음");
-        }
-        return commentPage.map(CommentResponseDto::new);
+        // 각 부모 댓글의 대댓글을 가져와서 DTO로 변환
+        return parentComments.map(comment -> {
+            List<Comment> childComments = commentRepository.findByParentCommentId(comment.getId());
+            return CommentResponseDto.fromEntity(comment, childComments);
+        });
 
     }
 

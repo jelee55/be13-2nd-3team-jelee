@@ -18,16 +18,15 @@
         try {
             const response = await apiClient.post(`/board`,formData);
 
-            console.log("formData==" + formData.title);
-            console.log("formData==" + formData.content);
-            
-
             if(response.status === 201){
                 alert(`정상적으로 등록`);
 
                 router.push({name:'board'});
             }
         } catch (error) {
+            if(error.response.status===400){
+                alert('500자이내작성')
+            }
             
         }
     }

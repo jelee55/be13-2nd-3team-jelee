@@ -12,17 +12,15 @@ import lombok.ToString;
 public class CommentRequestDto {
 
     private String content;
-//    private Long userId;
-//    private Long boardId;
-    private long parentId;
+    private Long parentId;
 
 
-    public Comment toEntity(User user, Board board){
+    public Comment toEntity(User user, Board board, Comment parentComment){
         return Comment.builder()
                 .content(this.content)
                 .board(board)
                 .user(user)
-                .parentId(this.parentId)
+                .parentComment(parentComment)
                 .build();
     }
 
