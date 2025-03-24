@@ -75,7 +75,7 @@ public class BoardController {
     @Operation(summary = "삭제", description = "게시글 삭제")
     public ResponseEntity<Long> delete(Principal principal,@PathVariable Long id){
         boardService.delete(principal, id);
-        return ResponseEntity.ok(id);
+        return  ResponseEntity.status(HttpStatus.OK).body(id);
     }
 
     @GetMapping("/{id}/likes")
