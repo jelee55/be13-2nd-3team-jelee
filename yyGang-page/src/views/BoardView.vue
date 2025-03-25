@@ -2,21 +2,22 @@
     <main>
         
         <div id="mainArea">
-            <h2 id="boardTitle">자유 게시판</h2>
+            <div id="div1">
+                <h2 id="boardTitle">자유 게시판</h2>
+                <button type="button" class="btn btn-success" @click="btnClick">등록하기</button>
+            </div>
             <BoardTable :boards="boards" @item-click="itemClick"/>
             
-            <RouterLink class="nav-link" :to="{name:`board/write`}"><button type="button" class="btn btn-success">등록하기</button></RouterLink>
+            <!-- <RouterLink class="nav-link" :to="{name:`board/write`}"><button type="button" class="btn btn-success">등록하기</button></RouterLink> -->
 
             <Pagination :pageInfo="pageInfo"
             @change-page="changePage"/>
-        </div>
-        
-
+        </div>             
     </main>
 </template>
 
 <script setup>
-    import apiClient from '@/api';
+ import apiClient from '@/api';
     import BoardTable from '@/components/board/BoardTable.vue';
     import { onMounted, ref, reactive, watch } from 'vue'; 
     import { useRoute, useRouter } from 'vue-router';
@@ -33,11 +34,11 @@
         listLimit: 0 // 한 페이지의 표시될 리스트의 수 
     });
     
+    
     const fetchBoards = async(page)=>{
         
         try {
             const response = await apiClient.get(`/board?page=${page-1}&size=10`);
-            console.log("response============"+response);
             
             boards.value = response.data.content; // 'content'가 있으면 사용
             pageInfo.totalCount = response.data.totalElements; // 전체 데이터 개수 설정
@@ -59,6 +60,10 @@
        }
     };
 
+    const btnClick = ()=>{
+        router.push({name:'board/write'})
+    }
+
     watch(currentRoute, ()=>{
         pageInfo.currentPage = parseInt(currentRoute.query.page) || 1;
 
@@ -70,7 +75,7 @@
     onMounted(function(){
         // fetchBoards();
         fetchBoards(pageInfo.currentPage); // 초기 페이지 로드 시 데이터를 불러옴
-    })
+    });
 
 
 </script>
@@ -84,5 +89,15 @@
         font-weight: bold;
         color: #3D8D7A;
         padding-bottom: 3%;
+    }
+    #div1{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: start;
     }   
+
+    #div1 button{
+        padding: 5px 10px;
+    }
 </style>

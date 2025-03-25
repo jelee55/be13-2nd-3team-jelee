@@ -48,6 +48,7 @@
 
 <style scoped>
     .table{
+        text-align: center;
         border-top: 1px solid #B4D1B6;
         padding: auto;
     }
@@ -57,4 +58,5 @@
     table tbody {
         color: #289631; /* 원하는 색상으로 변경 */
     }
+
 </style>

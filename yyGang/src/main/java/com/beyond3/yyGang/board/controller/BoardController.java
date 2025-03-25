@@ -35,9 +35,6 @@ public class BoardController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-
-
-
     @GetMapping
     @Operation(summary = "조회", description = "게시글 조회")
     public ResponseEntity<BoardPageResponseDto> findAll(
@@ -49,8 +46,6 @@ public class BoardController {
         return ResponseEntity.ok(boardList);
 
     }
-
-
 
 
     @GetMapping("/{id}")

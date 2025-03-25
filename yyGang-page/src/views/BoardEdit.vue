@@ -1,6 +1,6 @@
 <template>
     <main>
-        <h2 id="boardTitle">게시판 수정</h2>
+        <h2 id="boardTitle" class="titleLine">게시판 수정</h2>
         <BoardForm @form-submit="formSubmit" submit-button-text="수정" :board="board" id="boardContent"/>
     </main>
 </template>
@@ -61,6 +61,8 @@
         font-weight: bold;
         color: #3D8D7A;
         padding-bottom: 3%;
+    }
+    .titleLine{
         border-bottom: 2px solid rgb(51, 116, 51);
     }
 

@@ -1,8 +1,7 @@
 <template>
     <main>
-            <h2 id="boardTitle">게시판 작성</h2>
-            
-            <BoardForm @form-submit="formSubmit" submit-button-text="등록" id="boardContent"/>
+        <h2 id="boardTitle" class="titleLine">게시판 작성</h2>
+        <BoardForm @form-submit="formSubmit" submit-button-text="등록" id="boardContent"/>
     </main>
 </template>
 
@@ -36,9 +35,10 @@
 <style>
 #boardTitle{
     padding-bottom: 3%;
+}
+.titleLine{
     border-bottom: 2px solid rgb(51, 116, 51);
 }
-
 #boardContent{
     margin-top: 3%;
 }
