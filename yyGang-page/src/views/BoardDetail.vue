@@ -6,7 +6,12 @@
                     <h3 style="font-weight:bold">{{ board.title }}</h3>
                 </div>
                 <div id="boardInfo">
-                   작성자: {{ board.userName }} | 작성일 : {{ (board.createdAt) }}
+                    <div>작성자: {{ board.userName }}   |   작성일: {{ formatTime(board.createdAt) }}</div>
+                    <div>
+                        <!-- <font-awesome-icon :icon="['fas', 'heart']" :style="{color: activeColor}" @click="heartClick()"/> -->
+                        <i class="bi bi-heart" id="heart"  :style="{backgroundColor : activeColor}" @click="heartClick()"></i>
+                        <!-- <i v-else class="bi bi-heartc" id="heart" @click="heartClick()"></i> view 0개 -->
+                    </div>
                 </div>
                 <div id="boardContent">
                     {{board.content}}
@@ -80,6 +85,8 @@
     const newComment = ref(""); // 새 댓글 입력 필드
     const replyComment = ref(""); // 대댓글 입력 필드
     const replyTarget = ref(null); // 대댓글 입력 대상
+    const isLiked = ref(false);
+    const activeColor = ref("white");
 
     const userEmail = localStorage.getItem('userInfo');
 
@@ -220,10 +227,52 @@
         
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
+    
+    // 좋아요 세팅
+    const heartClick = async()=>{
+        console.log("heartClick");
+        
+        try {
+            const response = await apiClient.post(`/like/${currentRoute.params.id}`);
+
+            if(response.data === '좋아요 등록'){
+                activeColor.value = 'red';
+            }else{
+                activeColor.value = 'white';
+            }
+        } catch (error) {
+            
+        }
+        
+    }
+
+
+
+    // 좋아요 초기 세팅
+    const fetchBoardLike = async(id)=>{
+        console.log("좋아ㅛㅇ");
+        
+        try {
+            const response = await apiClient.get(`/like/${id}`);
+
+            console.log(response.data);
+            
+            // 행이 있는 경우(좋아요 눌러진 상태)
+            if(response.data){
+                activeColor.value = 'red';
+            }
+            
+        } catch (error) {
+            // alert(error.response.status);
+        }
+    }
 
     onMounted(function(){
         fetchBoard(currentRoute.params.id);
-        fetchComment(currentRoute.params.id)
+        fetchComment(currentRoute.params.id);
+
+        // 좋아요 정보 초기세팅
+        fetchBoardLike(currentRoute.params.id);
     });
     
 </script>
@@ -248,6 +297,9 @@
 }
 
 #boardInfo{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     color: gray;
     height: 50px;
     margin-bottom: 0%;
@@ -331,4 +383,6 @@
     color: #444;
     line-height: 1.4;
 }
+
+
 </style>

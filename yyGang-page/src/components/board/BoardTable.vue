@@ -1,21 +1,21 @@
 <template>
     <table class="table">
-    <thead>
-        <tr>
-        <th scope="col">번호</th>
-        <th scope="col">제목</th>
-        <th scope="col">작성자</th>
-        <th scope="col">등록일</th>
-        </tr>
-    </thead>
-    <tbody class="table-group-divider my-table">
-        <tr v-for="board in boards" :key="board.id" @click.stop="emit('item-click', board.id)" id="tabBoty">
-            <th scope="row">{{ board.id }}</th>
-            <td>{{ board.title }}</td>
-            <td>{{ board.userName }}</td>
-            <td>{{ formatTime(board.createdAt) }}</td>
-        </tr>
-    </tbody>
+        <thead>
+            <tr>
+                <th scope="col">번호</th>
+                <th scope="col">제목</th>
+                <th scope="col">작성자</th>
+                <th scope="col">등록일</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider my-table">
+            <tr v-for="board in boards" :key="board.id" @click.stop="emit('item-click', board.id)" id="boardItem">
+                <th scope="row">{{ board.id }}</th>
+                <td id="boardTitle">{{ board.title }}</td>
+                <td>{{ board.userName }}</td>
+                <td>{{ formatTime(board.createdAt) }}</td>
+            </tr>
+        </tbody>
     </table>
 </template>
 
@@ -48,9 +48,13 @@
 
 <style scoped>
     .table{
-        text-align: center;
+        /* text-align: center; */
         border-top: 1px solid #B4D1B6;
         padding: auto;
+    }
+
+    table > thead {
+        text-align: center;
     }
     table tbody th, td {
         color: grey;
@@ -59,4 +63,12 @@
         color: #289631; /* 원하는 색상으로 변경 */
     }
 
+    table tr{
+        height: 50px;
+        vertical-align: middle;
+    }
+
+    #boardItem{
+        text-align: left;
+    }
 </style>

@@ -42,4 +42,17 @@ public class BoardLikeServiceImpl implements BoardLikeService {
         return "좋아요 등록";
     }
 
+    @Override
+    public Boolean getLikeInfo(Principal principal, Long boardId) {
+
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new IllegalArgumentException("해당 게시글 없음"));
+
+        User user = userRepository.findByEmail(principal.getName()).orElseThrow(
+                () -> new IllegalArgumentException("일치하지 않음"));
+
+        Boolean likeInfo = boardLikeRepository.existsByUserAndBoard(user, board);
+        return likeInfo;
+    }
+
 }

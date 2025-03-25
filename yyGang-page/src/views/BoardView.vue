@@ -1,6 +1,5 @@
 <template>
     <main>
-        
         <div id="mainArea">
             <div id="div1">
                 <h2 id="boardTitle">자유 게시판</h2>
@@ -17,7 +16,7 @@
 </template>
 
 <script setup>
- import apiClient from '@/api';
+    import apiClient from '@/api';
     import BoardTable from '@/components/board/BoardTable.vue';
     import { onMounted, ref, reactive, watch } from 'vue'; 
     import { useRoute, useRouter } from 'vue-router';
@@ -80,7 +79,8 @@
 
 </script>
 
-<style>
+<style scoped>
+
     #mainArea{
         margin-top: 5%;
         height: 70%;
@@ -88,13 +88,14 @@
     #boardTitle{
         font-weight: bold;
         color: #3D8D7A;
-        padding-bottom: 3%;
+        padding-bottom: 10px;
     }
     #div1{
+        padding-bottom: 10px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        align-items: start;
+        align-items: end;
     }   
 
     #div1 button{

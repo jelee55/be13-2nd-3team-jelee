@@ -32,7 +32,7 @@
 </script>
 
 
-<style>
+<style scoped>
 #boardTitle{
     padding-bottom: 3%;
 }

@@ -1,5 +1,6 @@
 package com.beyond3.yyGang.board.controller;
 
+import com.beyond3.yyGang.board.entity.BoardLike;
 import com.beyond3.yyGang.board.service.BoardLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,12 @@ public class BoardLikeController {
     @Operation(summary = "좋아요", description = "좋아요 등록 취소")
     public ResponseEntity<String> insert(Principal principal, @PathVariable("id")Long boardId ){
         return ResponseEntity.ok(boardLikeService.insert(principal,boardId));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Boolean> getLikeInfo(Principal principal, @PathVariable("id") Long boardId){
+
+        return ResponseEntity.ok(boardLikeService.getLikeInfo(principal, boardId));
     }
 
 

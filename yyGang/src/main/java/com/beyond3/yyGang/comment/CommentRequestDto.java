@@ -12,7 +12,7 @@ import lombok.ToString;
 public class CommentRequestDto {
 
     private String content;
-    private Long parentId;
+     private Long parentId;
 
 
     public Comment toEntity(User user, Board board, Comment parentComment){
