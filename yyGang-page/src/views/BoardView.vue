@@ -1,14 +1,14 @@
 <template>
     <main>
-        <h2>자유 게시판</h2>
-
+        
         <div id="mainArea">
+            <h2 id="boardTitle">자유 게시판</h2>
             <BoardTable :boards="boards" @item-click="itemClick"/>
             
             <RouterLink class="nav-link" :to="{name:`board/write`}"><button type="button" class="btn btn-success">등록하기</button></RouterLink>
 
-            <!-- <Pagination :pageInfo="pageInfo"
-            @change-page="changePage"/> -->
+            <Pagination :pageInfo="pageInfo"
+            @change-page="changePage"/>
         </div>
         
 
@@ -21,29 +21,31 @@
     import { onMounted, ref, reactive, watch } from 'vue'; 
     import { useRoute, useRouter } from 'vue-router';
     import Pagination from '@/components/board/Pagination.vue';
-
-    const router = useRouter();
-    const currentRoute = useRoute();
-
-    // const pageInfo = reactive({
-    //     // 값을 정수로 변환하고 실패하면 1을 기본값으로 사용
-    //     currentPage: parseInt(currentRoute.query.page) || 1,
-    //     totalCount: 0, // 전체 데이터 수
-    //     pageLimit: 5, // 페이지네이션에 보이는 페이지의 수
-    //     listLimit: 0 // 한 페이지의 표시될 리스트의 수 
-    // });
     
     const boards = ref([]);
-    const fetchBoards = async()=>{
+    const router = useRouter();
+    const currentRoute = useRoute();
+    const pageInfo = reactive({
+        // 값을 정수로 변환하고 실패하면 1을 기본값으로 사용
+        currentPage: parseInt(currentRoute.query.page) || 1,
+        totalCount: 0, // 전체 데이터 수
+        pageLimit: 5, // 페이지네이션에 보이는 페이지의 수
+        listLimit: 0 // 한 페이지의 표시될 리스트의 수 
+    });
+    
+    const fetchBoards = async(page)=>{
+        
         try {
-            const response = await apiClient.get(`/board`);
+            const response = await apiClient.get(`/board?page=${page-1}&size=10`);
+            console.log("response============"+response);
+            
+            boards.value = response.data.content; // 'content'가 있으면 사용
+            pageInfo.totalCount = response.data.totalElements; // 전체 데이터 개수 설정
+            pageInfo.listLimit = 10; // 한 페이지에 표시된 게시물 수 (response.data.content.length)
 
-            boards.value = response.data;
-            // pageInfo.totalCount = response.data.totalCount;
-            // pageInfo.listLimit = 10;
-            
+
         } catch (error) {
-            
+            console.error("Error fetching boards:", error);
         }
     };
 
@@ -51,29 +53,36 @@
         router.push({name:'board/id', params:{id}});
     };
     
-    // const changePage = ({page,totalPages})=>{
-    //    if(page >=1 && page <= totalPages){
-    //         router.push({name:'board', query:{page}});
-    //    }
-    // };
+    const changePage = ({page,totalPages})=>{
+       if(page >=1 && page <= totalPages){
+            router.push({name:'board', query:{page}});
+       }
+    };
 
-    // watch(currentRoute, ()=>{
-    //     pageInfo.currentPage = parseInt(currentRoute.query.page) || 1;
+    watch(currentRoute, ()=>{
+        pageInfo.currentPage = parseInt(currentRoute.query.page) || 1;
 
-    //     fetchDepartments(pageInfo.currentPage);
-    // });
+        fetchBoards(pageInfo.currentPage); // URL에서 페이지 번호를 가져와서 boards 데이터를 다시 불러옴
 
-
-    onMounted(function(){
-        fetchBoards();
-    })
+    });
 
     
+    onMounted(function(){
+        // fetchBoards();
+        fetchBoards(pageInfo.currentPage); // 초기 페이지 로드 시 데이터를 불러옴
+    })
+
+
 </script>
 
 <style>
     #mainArea{
         margin-top: 5%;
         height: 70%;
+    }
+    #boardTitle{
+        font-weight: bold;
+        color: #3D8D7A;
+        padding-bottom: 3%;
     }   
 </style>

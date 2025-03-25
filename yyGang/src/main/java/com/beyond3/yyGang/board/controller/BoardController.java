@@ -1,5 +1,6 @@
 package com.beyond3.yyGang.board.controller;
 
+import com.beyond3.yyGang.board.dto.BoardPageResponseDto;
 import com.beyond3.yyGang.board.dto.BoardUpdateRequestDto;
 import com.beyond3.yyGang.board.entity.Board;
 import com.beyond3.yyGang.board.dto.BoardRequestDto;
@@ -39,11 +40,13 @@ public class BoardController {
 
     @GetMapping
     @Operation(summary = "조회", description = "게시글 조회")
-    public ResponseEntity<List<BoardResponseDto>> findAll(
+    public ResponseEntity<BoardPageResponseDto> findAll(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size ){
-        Page<BoardResponseDto> boardList = boardService.findAll(page, size);
-        return ResponseEntity.ok(boardList.getContent());
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ){
+        BoardPageResponseDto boardList = boardService.findAll(page, size);
+
+        return ResponseEntity.ok(boardList);
 
     }
 

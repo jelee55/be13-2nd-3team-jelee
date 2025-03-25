@@ -1,5 +1,6 @@
 package com.beyond3.yyGang.board.service;
 
+import com.beyond3.yyGang.board.dto.BoardPageResponseDto;
 import com.beyond3.yyGang.board.dto.BoardUpdateRequestDto;
 import com.beyond3.yyGang.board.entity.Board;
 import com.beyond3.yyGang.board.repository.BoardLikeRepository;
@@ -10,7 +11,6 @@ import com.beyond3.yyGang.user.domain.User;
 import com.beyond3.yyGang.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -59,7 +60,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Page<BoardResponseDto> findAll(int page, int size) {
+    public BoardPageResponseDto findAll(int page, int size) {
 
         if(page < 0 || size <= 0){
             throw new IllegalArgumentException("page, size가 유효하지 않음");
@@ -69,10 +70,14 @@ public class BoardServiceImpl implements BoardService {
 
         Page<Board> boardPage = boardRepository.findAll(pageable);
 
+        List<BoardResponseDto> boardResponseDto = boardPage.stream().map(BoardResponseDto::new).toList();
+
+
+        BoardPageResponseDto boardPageResponseDto = new BoardPageResponseDto(boardResponseDto, boardPage.getTotalElements());
         if (boardPage.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않음");
         }
-        return boardPage.map(BoardResponseDto::new);
+        return boardPageResponseDto;
     }
 
     @Override

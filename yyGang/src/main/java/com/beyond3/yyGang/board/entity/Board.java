@@ -1,7 +1,6 @@
 
 package com.beyond3.yyGang.board.entity;
 
-import com.beyond3.yyGang.board.dto.BoardRequestDto;
 import com.beyond3.yyGang.board.TimeStamped;
 import com.beyond3.yyGang.board.dto.BoardUpdateRequestDto;
 import com.beyond3.yyGang.comment.Comment;
@@ -35,7 +34,7 @@ public class Board extends TimeStamped {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board",cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments;
 
     public void update(BoardUpdateRequestDto requestDto) {

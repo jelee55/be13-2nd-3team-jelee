@@ -27,7 +27,7 @@ public class BoardResponseDto{
         this.userId = board.getUser().getUserId();
         this.userEmail = board.getUser().getEmail();
         this.userName = board.getUser().getName();
-        this.createdAt = board.getCreateAt();
+        this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
     }
 

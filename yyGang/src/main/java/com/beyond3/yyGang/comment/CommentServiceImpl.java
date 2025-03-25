@@ -30,10 +30,10 @@ public class CommentServiceImpl implements CommentService {
     public void save(Principal principal, Long boardId, CommentRequestDto requestDto, Long parentId) {
 
         Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new IllegalArgumentException("해당 게시글 없음"));
+                () -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         User user = userRepository.findByEmail(principal.getName()).orElseThrow(
-                () -> new IllegalArgumentException("해당 유저 없으"));
+                () -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Comment parentComment = null;
 
