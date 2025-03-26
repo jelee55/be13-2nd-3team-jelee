@@ -3,7 +3,7 @@
         <div id="mainArea">
             <div id="div1">
                 <h2 id="boardTitle">자유 게시판</h2>
-                <button type="button" class="btn btn-success" @click="btnClick">등록하기</button>
+                <button type="button" class="btn btn-success" @click="btnClick" >등록하기</button>
             </div>
             <BoardTable :boards="boards" @item-click="itemClick"/>
             
@@ -32,6 +32,7 @@
         pageLimit: 5, // 페이지네이션에 보이는 페이지의 수
         listLimit: 0 // 한 페이지의 표시될 리스트의 수 
     });
+
     
     
     const fetchBoards = async(page)=>{
@@ -67,7 +68,7 @@
         pageInfo.currentPage = parseInt(currentRoute.query.page) || 1;
 
         fetchBoards(pageInfo.currentPage); // URL에서 페이지 번호를 가져와서 boards 데이터를 다시 불러옴
-
+        
     });
 
     

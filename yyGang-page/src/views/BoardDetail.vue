@@ -9,7 +9,12 @@
                     <div>작성자: {{ board.userName }}   |   작성일: {{ formatTime(board.createdAt) }}</div>
                     <div>
                         <!-- <font-awesome-icon :icon="['fas', 'heart']" :style="{color: activeColor}" @click="heartClick()"/> -->
-                        <i class="bi bi-heart" id="heart"  :style="{backgroundColor : activeColor}" @click="heartClick()"></i>
+                        <!-- <i class="bi bi-heart-fill color-red" ></i> {{ likeCount }}
+                        <i class="bi bi-heart" id="heart"  :style="{backgroundColor : activeColor}" @click="heartClick()" ></i> -->
+
+                        <i v-if="isLiked" class="bi bi-heart-fill" style="color: red;" @click="heartClick()"></i>
+                        <i v-else class="bi bi-heart" @click="heartClick()"></i>
+                        <i>{{ likeCount }}</i>
                         <!-- <i v-else class="bi bi-heartc" id="heart" @click="heartClick()"></i> view 0개 -->
                     </div>
                 </div>
@@ -23,9 +28,10 @@
                 <button @click="btnClick" class="btn btn-success">뒤로가기</button>
             </div>
             <div class="mt-2 p-3 bg-body rounded shadow-sm">
-                <h4 id="commentTitle">댓글 {{comment.length }}개</h4>
-
-                <h2 class="fs-6">댓글 쓰기</h2>
+                <div id="h2Div">
+                    <h2 class="fs-6">댓글 작성</h2>
+                    <h2 class="fs-6">댓글 수: {{comment.length }}</h2>
+                </div>
 
                 <input class="form-control" type="text" v-model.trim="newComment">
                 <div class="form-text">존중과 배려하는 마음으로 건강한 댓글 문화를 함께 만들어가요.</div>
@@ -87,27 +93,98 @@
     const replyTarget = ref(null); // 대댓글 입력 대상
     const isLiked = ref(false);
     const activeColor = ref("white");
+    const likeCount = ref(0);
 
     const userEmail = localStorage.getItem('userInfo');
 
-    
+    // 좋아요 개수 가져오기
+    const fetchLikeInfo = async(id)=>{
+        try {
+            const response = await apiClient.get(`/board/${id}/likes`);
+            
+            likeCount.value = response.data;
+            
+
+        } catch (error) {
+            console.error("좋아요 개수 불러오기 실패", error);
+            
+        }
+    };
+
+    //   // 좋아요 초기 세팅
+    //   const fetchBoardLike = async(id)=>{
+    //     console.log("좋아ㅛㅇ");
+        
+    //     try {
+    //         const response = await apiClient.get(`/like/${id}`);
+
+            
+    //         // 행이 있는 경우(좋아요 눌러진 상태)
+    //         if(response.data){
+    //             activeColor.value = 'red';
+    //         }
+            
+    //     } catch (error) {
+    //         // alert(error.response.status);
+    //     }
+    // };
+    //   // 좋아요 세팅
+    //   const heartClick = async()=>{
+    //     try {
+    //         const response = await apiClient.post(`/like/${currentRoute.params.id}`);
+    //         if (response && response.data) {
+    //             activeColor.value = response.data === '좋아요 등록' ? 'red' : 'white';
+    //             await fetchLikeInfo(currentRoute.params.id); // 좋아요 개수 다시 불러오기
+    //         } else {
+    //             throw new Error("서버 응답이 없습니다.");
+    //         }
+    //     } catch (error) {
+    //         console.error("좋아요 처리 오류", error);
+    //         alert("좋아요 처리 중 오류가 발생했습니다.");
+    //     }
+            
+    // };
+
+    const fetchBoardLike = async (id) => {
+        try {
+            const response = await apiClient.get(`/like/${id}`);
+            isLiked.value = !!response.data; // 값이 있으면 true (좋아요 상태)
+        } catch (error) {
+            console.error("좋아요 정보 불러오기 실패", error);
+        }
+    };
+    const heartClick = async () => {
+        try {
+            const response = await apiClient.post(`/like/${currentRoute.params.id}`);
+            if (response && response.data) {
+                isLiked.value = response.data === '좋아요 등록'; // 상태 변경
+                await fetchLikeInfo(currentRoute.params.id); // 좋아요 개수 다시 불러오기
+            } else {
+                throw new Error("서버 응답이 없습니다.");
+            }
+        } catch (error) {
+            console.error("좋아요 처리 오류", error);
+            alert("좋아요 처리 중 오류가 발생했습니다.");
+        }
+    };
+
+
+    // 게시글 정보 가져오기
     const fetchBoard = async(id)=>{
         try {
             const response = await apiClient.get(`/board/${id}`);
             
-            // console.log(response.data);
-  
             Object.assign(board, response.data);
+            
         } catch (error) {
             
         }
     };
 
+    // 댓글 정보 가져오기
     const fetchComment = async(id)=>{
         try {
             const response = await apiClient.get(`/board/${id}/comment`);
-
-            console.log(response.data);
 
             comment.value = await response.data;
 
@@ -129,11 +206,7 @@
     // 댓글 추가 기능
     const addComment = async (parentId) => {
 
-        console.log("입력된 댓글 내용:", newComment.value);
         const content = parentId ? replyComment.value : newComment.value;
-
-        console.log("parentId:", parentId);
-        console.log("댓글 내용:", content);  // content 값 출력
 
         if (!content.trim()) {
             return alert("댓글을 입력하세요!");
@@ -141,13 +214,11 @@
 
 
         try {
-            console.log("보내는 데이터:", { content: content.trim(), parentId });
             const response = await apiClient.post(`/board/${board.id}/comment`, 
                 { content: content.trim() }, 
                 { params: parentId ? { parentId } : {} } // parentId가 있을 경우만 추가
             );
 
-            console.log("서버 응답:", response.data);
 
             if (response.status === 201) {
                  // 댓글 목록 다시 불러오기
@@ -161,33 +232,22 @@
                 newComment.value = "";
             }
 
-            //      // 새로운 댓글 또는 대댓글 추가
-            //     if (parentId) {
-            //         const parentComment = comment.value.find(cmt => cmt.id === parentId);
-            //         if (parentComment) parentComment.childComments.push(response.data);
-            //         replyComment.value = "";
-            //         replyTarget.value = null;
-            //     } else {
-            //         comment.value.push(response.data);
-            //         newComment.value = "";
-            //     }
             }
         } catch (error) {
-            console.error("댓글 추가 실패", error);
-            alert("댓글 추가 중 오류 발생");
+            alert(`댓글을 추가하는 중 오류가 발생했습니다.`);
         }
     };
 
 
-    
+    // 게시글 삭제
     const delBtnClick = async(id)=>{
         try {
 
-            if(confirm("삭제????")){
+            if(confirm("삭제하시겠습니까?")){
                 const response = await apiClient.delete(`/board/${id}`); 
                 
                 if(response.status === 200){
-                    alert(`정상적으로 삭제`);
+                    alert(`삭제되었습니다.`);
                     router.push({name:'board'});
                 }
             }else{
@@ -197,12 +257,12 @@
             
         } catch (error) {
             if (error.response.data.code === 403) {
-                alert(`권한이 없는 사용자임`);
+                alert(`삭제 권한이 없습니다`);
             }else if(error.response.data.code === 404){
-                alert(error.response.data.message);
+                alert("게시글 삭제 중 오류가 발생했습니다.");
                 router.push({name:'departments'});
             }else{
-                alert('에러가 발생');
+                alert(`게시글 삭제 오류", ${error}`);
             }
         }
     };
@@ -210,11 +270,12 @@
         router.push({name:'board'});
     };
 
+    // 수정
     const editBtnClick = (id)=>{
-        console.log(id); 
-        
         router.push({name:'board/edit/id', params:{id}});
     };
+
+    // 날짜 
     const formatTime = (dateString) => {
         const date = new Date(dateString);
   
@@ -228,51 +289,15 @@
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
     
-    // 좋아요 세팅
-    const heartClick = async()=>{
-        console.log("heartClick");
-        
-        try {
-            const response = await apiClient.post(`/like/${currentRoute.params.id}`);
-
-            if(response.data === '좋아요 등록'){
-                activeColor.value = 'red';
-            }else{
-                activeColor.value = 'white';
-            }
-        } catch (error) {
-            
-        }
-        
-    }
-
-
-
-    // 좋아요 초기 세팅
-    const fetchBoardLike = async(id)=>{
-        console.log("좋아ㅛㅇ");
-        
-        try {
-            const response = await apiClient.get(`/like/${id}`);
-
-            console.log(response.data);
-            
-            // 행이 있는 경우(좋아요 눌러진 상태)
-            if(response.data){
-                activeColor.value = 'red';
-            }
-            
-        } catch (error) {
-            // alert(error.response.status);
-        }
-    }
+  
 
     onMounted(function(){
         fetchBoard(currentRoute.params.id);
         fetchComment(currentRoute.params.id);
-
         // 좋아요 정보 초기세팅
         fetchBoardLike(currentRoute.params.id);
+
+        // fetchLikeInfo(currentRoute.params.id);
     });
     
 </script>
@@ -286,8 +311,6 @@
 }
 
 #boardArea{
-    /* display: grid; */
-    /* grid-template-rows: 2fr 0.3fr 5fr; */
     padding: 5%;
     /* height: 500px; */
     border: 1px solid #ddd;
@@ -310,8 +333,20 @@
 }
 
 #btnArea{
-    margin-top: 3%; 
-    
+    margin-top: 3%;
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-end;
+    gap: 10px;
+}
+
+.bi-heart-fill::before{
+    color: red;
+}
+#h2Div{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
 }
 
 #commentArea {
